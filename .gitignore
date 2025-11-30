@@ -1,0 +1,40 @@
+.env
+.DS_Store
+
+#Buidler files
+cache
+artifacts
+
+node_modules
+dist/
+build/
+.vscode
+.idea
+ts-types/
+contracts/hardhat-dependency-compiler/
+
+coverage
+.coverage_artifacts
+.coverage_cache
+.coverage_contracts
+typechain
+types
+deployments
+
+node_modules
+.env
+
+# Hardhat files
+/cache
+/artifacts
+
+# TypeChain files
+/typechain
+/typechain-types
+
+# solidity-coverage files
+/coverage
+/coverage.json
+
+# Hardhat Ignition default folder for deployments against a local node
+ignition/deployments/chain-31337
