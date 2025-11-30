@@ -10,7 +10,7 @@
 		"outDir": "dist",
 		"skipLibCheck": true
 	},
-	"include": ["deploy", "helpers", "typechain", "tests"],
+	"include": ["deploy", "helpers", "typechain", "tests", "scripts"],
 	"exclude": ["node_modules", "dist", "build"],
 	"files": ["./hardhat.config.ts"]
 }

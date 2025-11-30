@@ -20,6 +20,17 @@
 		"tslint-plugin-prettier": "^2.3.0",
 		"typescript": "^4.3.2"
 	},
+	"scripts": {
+		"run-env": "npm ci && tail -f /dev/null",
+		"cp-typechain": "cp typechain/*.d.ts ./dist/types/typechain",
+		"build": "tsc --project lib.tsconfig.json && npm run cp-typechain",
+		"clean": "rm -rf artifacts/ dist/ typechain/",
+		"compile": "npx hardhat compile",
+		"node": "npx hardhat node --no-deploy",
+		"deploy": "if [ \"$SKIP_COMPILE\" = 'true' ]; then echo '[Warning] Skipping compilation'; else npm run compile; fi && HARDHAT_NETWORK=xrplevm-testnet npx hardhat deploy --no-compile",
+		"test": "HARDHAT_NETWORK=xrplevm-testnet MARKET_NAME=Aave npx hardhat test test/AaveV3LiquidationBot.ts",
+		"bot": "HARDHAT_NETWORK=xrplevm-testnet ts-node scripts/AaveV3LiquidationBot.ts"
+	},
 	"dependencies": {
 		"@aave/core-v3": "^1.19.3"
 	}

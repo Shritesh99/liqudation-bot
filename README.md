@@ -60,6 +60,7 @@ HARDHAT_NETWORK=xrplevm-testnet MARKET_NAME=Aave npx hardhat deploy
 ### 3. Install dependencies
 
 ```
+cd bot
 npm i
 ```
 

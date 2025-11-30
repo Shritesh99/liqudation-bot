@@ -17,42 +17,15 @@ describe("AaveV3LiquidationBot - XRP EVM Testnet", () => {
 	let borrower: SignerWithAddress;
 	let attacker: SignerWithAddress;
 
-	// XRP EVM Testnet - Pool Addresses
-	const POOL_PROXY_ADDRESS = "0x2Bd659a3eCD54FF2143DE3e774f46E884658B06f"; // Pool-Proxy-Aave
-	const ADDRESS_PROVIDER = "0x6b698FB7F6f813f7F2663e2AcffdcA8F350719e8"; // PoolAddressesProvider-Aave
-	const POOL_DATA_PROVIDER = "0x523240bC63d1F12F1239874059d819FeD7E62444"; // PoolDataProvider-Aave
-	const AAVE_ORACLE = "0x2cA403099B4bf3ca5007256bF05e5E447677DB7F"; // AaveOracle-Aave
-	const POOL_CONFIGURATOR = "0xB4f1b9C8Ea4C382688dD86fE2B14889a23c2e1a4"; // PoolConfigurator-Proxy-Aave
-	const ACL_MANAGER = "0x92DbdE61c2f5f5556064ee8fbE1bD17452EFA1BA"; // ACLManager-Aave
-	const FAUCET = "0xAd0f70996f82f314b2a511330cc5208f6C546e78"; // Faucet-Aave
-
-	// XRP EVM Testnet - Token Addresses
-	const WETH_ADDRESS = "0xD4af7891561bf8B6123e54A67B46D37AdF74B90B"; // WETH-TestnetMintableERC20-Aave
-	const USDC_ADDRESS = "0x7Fd95Fb54726e26E80AF4DfAea7429fFE2060612"; // USDC-TestnetMintableERC20-Aave
-	const DAI_ADDRESS = "0x467a84dB50e42d88B9F3273328EF7fE1Ab5eE12A"; // DAI-TestnetMintableERC20-Aave
-	const LINK_ADDRESS = "0x1cA8BA5d3350B3579b1995c24406f16115ed02dC"; // LINK-TestnetMintableERC20-Aave
-	const WBTC_ADDRESS = "0xEe4AfaD7385F7fA976aB125388A686DeEe7cc012"; // WBTC-TestnetMintableERC20-Aave
-	const USDT_ADDRESS = "0xEbb6c020b0a2402e8abCdAA2059681547dA2b605"; // USDT-TestnetMintableERC20-Aave
-	const AAVE_REWARD_ADDRESS = "0x9dbD4D7E3ED41395C7429e745a471F9440DAa485"; // AAVE-TestnetMintableERC20-Aave
-	const EURS_ADDRESS = "0x233bB35b651EAfB16bA8428688925122eAB714D5"; // EURS-TestnetMintableERC20-Aave
-
-	// XRP EVM Testnet - AToken Addresses
-	const aWETH_ADDRESS = "0x59E9Ab606C7F6C99A427801ce0ffD941EF9CeEDc"; // WETH-AToken-Aave
-	const aUSDC_ADDRESS = "0x32635BcBf8847689ce2b7c1858501b37e7Ce1E16"; // USDC-AToken-Aave
-	const aDAI_ADDRESS = "0x52080CcfF6bc4a368cC88D27EA5444a5B2c4c5FA"; // DAI-AToken-Aave
-
-	// XRP EVM Testnet - Debt Token Addresses
-	const debtUSDC_VARIABLE = "0x51448EA131846d88Ec932fEf93375923568Ea25a"; // USDC-VariableDebtToken-Aave
-	const debtUSDC_STABLE = "0x93f17D458110E4B4cc850f2ECBaF7E0929816966"; // USDC-StableDebtToken-Aave
-	const debtWETH_VARIABLE = "0x6Cf1C45D2F45025589b80FB547f882F0351A018c"; // WETH-VariableDebtToken-Aave
-	const debtWETH_STABLE = "0x948c150430999664ECbD9107C2E926f51aF1899c"; // WETH-StableDebtToken-Aave
-	const debtDAI_VARIABLE = "0x7bE98B5DB951F87644A886477d716270C6106D97"; // DAI-VariableDebtToken-Aave
-
-	// Bot Address
-	const BOT_ADDRESS = "0xeD041d002B1976c642Aeb2d9b914d064339a23a6";
-
-	// Deployer address from deployment output
-	const DEPLOYER_ADDRESS = "0xA1Cf6afA635e8Ea6Cf3d46c6857982273Ae7D2Ef";
+	const POOL_ADDRESS = process.env.POOL_ADDRESS;
+	const ADDRESS_PROVIDER = process.env.ADDRESS_PROVIDER;
+	const FAUCET = process.env.FAUCET;
+	const WETH_ADDRESS = process.env.WETH_ADDRESS;
+	const USDC_ADDRESS = process.env.USDC_ADDRESS;
+	const aWETH_ADDRESS = process.env.aWETH_ADDRESS;
+	const aUSDC_ADDRESS = process.env.aUSDC_ADDRESS;
+	const debtUSDC_VARIABLE = process.env.debtUSDC_VARIABLE;
+	const BOT_ADDRESS = process.env.BOT_ADDRESS;
 
 	// Test amounts
 	const WETH_SUPPLY = hre.ethers.utils.parseUnits("50", 18);
@@ -64,14 +37,13 @@ describe("AaveV3LiquidationBot - XRP EVM Testnet", () => {
 	before(async () => {
 		[owner, lender, borrower, attacker] = await hre.ethers.getSigners();
 
-		console.log("\n📋 Test Setup Information:");
+		console.log("\n Test Setup Information:");
 		console.log(`   Owner: ${owner.address}`);
 		console.log(`   Lender: ${lender.address}`);
 		console.log(`   Borrower: ${borrower.address}`);
 		console.log(`   Attacker: ${attacker.address}\n`);
 
-		// Get contract instances
-		pool = await hre.ethers.getContractAt("IPool", POOL_PROXY_ADDRESS);
+		pool = await hre.ethers.getContractAt("Pool", POOL_ADDRESS);
 		weth = await hre.ethers.getContractAt("IERC20", WETH_ADDRESS);
 		usdc = await hre.ethers.getContractAt("IERC20", USDC_ADDRESS);
 		aWeth = await hre.ethers.getContractAt("IERC20", aWETH_ADDRESS);
@@ -81,24 +53,21 @@ describe("AaveV3LiquidationBot - XRP EVM Testnet", () => {
 			debtUSDC_VARIABLE
 		);
 
-		// Get or deploy liquidation bot
 		try {
 			liquidationBot = await hre.ethers.getContractAt(
 				"AaveV3LiquidationBot",
 				BOT_ADDRESS
 			);
 		} catch (error) {
-			// Deploy if doesn't exist
 			const LiquidationBotFactory =
 				await hre.ethers.getContractFactory("AaveV3LiquidationBot");
 			liquidationBot = await LiquidationBotFactory.deploy(
 				ADDRESS_PROVIDER
 			);
 			await liquidationBot.waitForDeployment();
-			console.log(`✅ LiquidationBot deployed at: ${BOT_ADDRESS}\n`);
+			console.log(`LiquidationBot deployed at: ${BOT_ADDRESS}\n`);
 		}
 
-		// Mint tokens via faucet
 		const faucet = await hre.ethers.getContractAt(
 			[
 				"function mint(address token, address to, uint256 amount) external",
@@ -106,9 +75,8 @@ describe("AaveV3LiquidationBot - XRP EVM Testnet", () => {
 			FAUCET
 		);
 
-		console.log("🔨 Minting test tokens via faucet...");
+		console.log("Minting test tokens via faucet...");
 		try {
-			// Mint WETH
 			await faucet.mint(WETH_ADDRESS, lender.address, WETH_SUPPLY);
 			await faucet.mint(
 				WETH_ADDRESS,
@@ -116,14 +84,13 @@ describe("AaveV3LiquidationBot - XRP EVM Testnet", () => {
 				WETH_COLLATERAL.mul(2n)
 			);
 
-			// Mint USDC
 			await faucet.mint(USDC_ADDRESS, lender.address, USDC_SUPPLY);
 			await faucet.mint(USDC_ADDRESS, BOT_ADDRESS, USDC_SUPPLY);
 
-			console.log("✅ Tokens minted successfully\n");
+			console.log("Tokens minted successfully\n");
 		} catch (error) {
 			console.error(
-				"⚠️  Faucet mint failed (tokens may already exist):",
+				"Faucet mint failed (tokens may already exist):",
 				error
 			);
 		}
@@ -253,7 +220,6 @@ describe("AaveV3LiquidationBot - XRP EVM Testnet", () => {
 		it("Borrower should borrow USDC against WETH collateral", async () => {
 			const poolWithBorrower = pool.connect(borrower);
 
-			// Borrow (interestRateMode = 2 for variable)
 			await poolWithBorrower.borrow(
 				USDC_ADDRESS,
 				USDC_BORROW,
@@ -286,7 +252,6 @@ describe("AaveV3LiquidationBot - XRP EVM Testnet", () => {
 				healthFactor,
 			] = await pool.getUserAccountData(borrower.address);
 
-			console.log(`\n📊 Borrower Account Data:`);
 			console.log(
 				`   Total Collateral: ${hre.ethers.utils.formatUnits(
 					totalCollateralBase,
@@ -352,7 +317,6 @@ describe("AaveV3LiquidationBot - XRP EVM Testnet", () => {
 
 	describe("Profit Withdrawal - ERC20", () => {
 		it("Owner should withdraw partial profits", async () => {
-			// Add profits to bot
 			const profitAmount = hre.ethers.utils.parseUnits("1", 6); // 1 USDC
 			const usdcWithLender = usdc.connect(lender);
 			await usdcWithLender.transfer(BOT_ADDRESS, profitAmount);
@@ -424,14 +388,12 @@ describe("AaveV3LiquidationBot - XRP EVM Testnet", () => {
 		});
 
 		it("Should revert withdrawAll if no balance", async () => {
-			// Try to withdraw from token with no balance
 			const emptyAddress = hre.ethers.Wallet.createRandom().address;
 
 			const tx = liquidationBot
 				.connect(owner)
 				.withdrawAllProfits(emptyAddress);
 
-			// Will fail at IERC20 level
 			await expect(tx).to.be.reverted;
 		});
 	});
@@ -504,7 +466,6 @@ describe("AaveV3LiquidationBot - XRP EVM Testnet", () => {
 		it("Should prepare for flash loan liquidation", async () => {
 			const liquidationBotWithOwner = liquidationBot.connect(owner);
 
-			// Just verify setup is correct
 			const botAddress = BOT_ADDRESS;
 			const botBalance = await usdc.balanceOf(botAddress);
 
@@ -515,13 +476,11 @@ describe("AaveV3LiquidationBot - XRP EVM Testnet", () => {
 			const botAddress = BOT_ADDRESS;
 			const botBalance = await usdc.balanceOf(botAddress);
 
-			// Should have at least debt + flash loan fee
 			const expectedMinimum = DEBT_TO_COVER.mul(1005n).div(1000n); // 0.5% fee
 			expect(botBalance).to.be.greaterThanOrEqual(expectedMinimum);
 		});
 
 		it("executeOperation should be callable", async () => {
-			// Just verify function exists and has correct signature
 			expect(liquidationBot.executeOperation).to.exist;
 		});
 	});
@@ -537,7 +496,6 @@ describe("AaveV3LiquidationBot - XRP EVM Testnet", () => {
 				0
 			);
 
-			// Flash loan should reject zero amount
 			await expect(tx).to.be.rejected;
 		});
 
@@ -663,21 +621,18 @@ describe("AaveV3LiquidationBot - XRP EVM Testnet", () => {
 					USDC_ADDRESS,
 					DEBT_TO_COVER
 				);
-			} catch (error) {
-				// Expected to fail
-			}
+			} catch (error) {}
 
 			expect(await liquidationBot.owner()).to.equal(owner.address);
 		});
 
 		it("Full workflow: setup, borrow, and prepare for liquidation", async () => {
-			// Verify all setup is complete
 			const [totalCollateral, totalDebt, , , , healthFactor] =
 				await pool.getUserAccountData(borrower.address);
 
 			console.log(`\n✅ Full Integration Test Complete`);
 			console.log(
-				`   Borrower Collateral: ${hre.ether.utils.formatUnits(
+				`   Borrower Collateral: ${hre.ethers.utils.formatUnits(
 					totalCollateral,
 					8
 				)}`
